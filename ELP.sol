@@ -40,7 +40,7 @@ contract ELP is ERC20
 
     function OrderYourTokens() payable public
     {
-        require(msg.value==0.1 ether,"Error - ELP.sol - Function:OrderYourTokens - User Didn't pay conversion fee");
+        require(msg.value==0.001 ether,"Error - ELP.sol - Function:OrderYourTokens - User Didn't pay conversion fee");
         
         emit paidForTransferring(msg.sender);
     }

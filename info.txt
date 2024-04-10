@@ -1,13 +1,21 @@
 [[ELP.sol]]:
-Deployed & Verified at: 0xb14A59F98a2E1F0C8567EA628FB1D94f00509D03
+Deployed & Verified at: 0xAf6811D31E359A45EbbC72B4873fB43257B1a6b3
 By: 0x73029Df592EC27FeDddE45a512B4c42ad35A3e7d (Anuj's account)
 -----------------------------------------------------------------------------
 
-[[EIGEN.sol]]:
+[[ELP_MARKETPLACE.sol]]:
+Deployed & Verified at: 0x86e71886824eB64a09cBB097D4c96BE56E5C25F6
+By: 0x73029Df592EC27FeDddE45a512B4c42ad35A3e7d (Anuj's account)
+-----------------------------------------------------------------------------
+
+[[AIRDROP.sol]]: NOT DEPLOYED YET
 Deployed at: --
 By: --
 -----------------------------------------------------------------------------
 
-[[AIRDROP.sol]]:
+[[EIGEN.sol]]: NOT DEPLOYED YET
 Deployed at: --
 By: --
+-----------------------------------------------------------------------------
+
+Testnet: Base Sepolia
