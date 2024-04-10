@@ -8,21 +8,13 @@ Deployed & Verified at: 0x86e71886824eB64a09cBB097D4c96BE56E5C25F6
 By: 0x73029Df592EC27FeDddE45a512B4c42ad35A3e7d (Anuj's account)
 -----------------------------------------------------------------------------
 
-[[AIRDROP.sol]]: NOT DEPLOYED YET
-Deployed at: --
-By: --
------------------------------------------------------------------------------
-
 [[EIGEN.sol]]: NOT DEPLOYED YET
 Deployed at: --
 By: --
 -----------------------------------------------------------------------------
 
-<<<<<<< HEAD
-Testnet: Base Sepolia
-=======
-[[ELP_MARKETPLACE.sol]]:
+[[AIRDROP.sol]]: NOT DEPLOYED YET
 Deployed at: --
 By: --
 -----------------------------------------------------------------------------
->>>>>>> origin/main
+Testnet: Base Sepolia
