@@ -45,7 +45,7 @@ contract ELP is ERC20
         emit paidForTransferring(msg.sender);
     }
 
-    function withdrawOrderingFees() onlyDistributor() public
+    function withdrawOrderingFees() onlyDistributor public
     {
         payable(ownerAndDistributor).transfer(address(this).balance);
     }
