@@ -7,36 +7,60 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract ELP_Marketplace is ReentrancyGuard
 {
-    address constant ELP= 0xAf6811D31E359A45EbbC72B4873fB43257B1a6b3; //Base Sepolia Testnet
+    enum status{live,cancelled,bought}
 
+    address ELP; //The address of the $ELPs contract
+    
     struct Listing
     {
         address seller;
         uint256 quantity;
         uint256 totalPrice;
-        bool isActive;
+        status listingStatus;
     }
 
-    mapping(uint256 => Listing) public listings;
-    uint256 public listingCount;
+    //mapping(uint256 => Listing) public listings;
+    Listing[] public listings;
+    mapping(address => uint256) public totalPointsListedByUser;
 
     event ListingCreated(uint256 indexed id, address seller, uint256 quantity, uint256 totalPrice);
+    event ListingCancelled(uint256 indexed id, address seller);
     event TradeExecuted(uint256 indexed id, address buyer, uint256 quantity, uint256 totalPrice);
+
+
+    constructor(address _ELP)
+    {
+        ELP=_ELP;
+    }
+
+    //approval must be asked for
 
     function createListing(uint256 quantity, uint256 totalPrice) external
     {
         require(quantity > 0 && totalPrice > 0, "Error - MARKETPLACE.sol - Function:createListing - Invalid listing parameters");
         require(IERC20(ELP).balanceOf(msg.sender)>=quantity, "Error - MARKETPLACE.sol - Function:createListing - You are trying to list more tokens than you have");
+        require(totalPointsListedByUser[msg.sender]<=IERC20(ELP).balanceOf(msg.sender), "Error - MARKETPLACE.sol - Function:createListing - You don't have enough points to list this");
+
+        listings.push(Listing(msg.sender, quantity, totalPrice, status.live));
+        totalPointsListedByUser[msg.sender]+=quantity;
         
-        uint256 id = listingCount++;
-        listings[id] = Listing(msg.sender, quantity, totalPrice, true);
-        
-        emit ListingCreated(id, msg.sender, quantity, totalPrice);
+        emit ListingCreated(listings.length-1, msg.sender, quantity, totalPrice);
+    }
+
+    function cancelListing(uint256 id) external
+    {
+        require (msg.sender==listings[id].seller,"Error - MARKETPLACE.sol - Function:cancelListing - You aren't the owner of this listing");
+        require (listings[id].listingStatus==status.live,"Error - MARKETPLACE.sol - Function:cancelListing - You can't cancel this listing");
+
+        listings[id].listingStatus=status.cancelled;
+        totalPointsListedByUser[msg.sender]-=listings[id].quantity;
+
+        emit ListingCancelled(id,msg.sender);
     }
 
     function buyListing(uint256 id) external payable nonReentrant
     {
-        require(listings[id].isActive, "Error - MARKETPLACE.sol - Function:buyListing - Listing is inactive");
+        require(listings[id].listingStatus==status.live, "Error - MARKETPLACE.sol - Function:buyListing - Listing is not live");
         require(msg.value == listings[id].totalPrice, "Error - MARKETPLACE.sol - Function:buyListing - Incorrect payment amount");
         require(IERC20(ELP).allowance(listings[id].seller,address(this))>=listings[id].quantity,"Error - MARKETPLACE.sol - Function:buyListing - Seller denied the the contract's spending approval");
         require(IERC20(ELP).balanceOf(listings[id].seller)>=listings[id].quantity,"Error - MARKETPLACE.sol - Function:buyListing - Seller doesn't have enough balance to complete the sale");
@@ -45,8 +69,15 @@ contract ELP_Marketplace is ReentrancyGuard
 
         payable(listings[id].seller).transfer(msg.value);
 
-        listings[id].isActive = false;
+        listings[id].listingStatus = status.bought;
+        totalPointsListedByUser[listings[id].seller]-=listings[id].quantity;
 
         emit TradeExecuted(id, msg.sender, listings[id].quantity, msg.value);
     }
+
+    function getListings() public view returns (Listing[] memory)
+    {
+        return listings;
+    }
+
 }
