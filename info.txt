@@ -4,17 +4,17 @@ By: 0x73029Df592EC27FeDddE45a512B4c42ad35A3e7d (Anuj's account)
 -----------------------------------------------------------------------------
 
 [[ELP_MARKETPLACE.sol]]:
-Deployed & Verified at: 0x86e71886824eB64a09cBB097D4c96BE56E5C25F6
+Deployed & Verified at: 0x4777f853fF9c3203eF7232C6fD27f41195509009
+By: 0xF9264dB5F1888EE15C0DF970761a3B2Dc28b0fc3
+-----------------------------------------------------------------------------
+
+[[EIGEN.sol]]:
+Deployed at: 0x8c76c1a8daEB698c742b48f6FA8BBDb8CE4f751a
 By: 0x73029Df592EC27FeDddE45a512B4c42ad35A3e7d (Anuj's account)
 -----------------------------------------------------------------------------
 
-[[EIGEN.sol]]: NOT DEPLOYED YET
-Deployed at: --
-By: --
------------------------------------------------------------------------------
-
-[[AIRDROP.sol]]: NOT DEPLOYED YET
-Deployed at: --
-By: --
+[[AIRDROP.sol]]:
+Deployed at: 0x01c3eb121B14fc72a76e2ae22F3e33a6A0a9b3ef
+By: 0x73029Df592EC27FeDddE45a512B4c42ad35A3e7d (Anuj's account)
 -----------------------------------------------------------------------------
 Testnet: Base Sepolia
