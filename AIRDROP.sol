@@ -7,42 +7,34 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract AIRDROP is ReentrancyGuard
 {
-    address constant ELP=0x63709E505857e230AF10DeF0E8FCaDA2b563FBfc;
-    address constant EIGEN=0x4e890A72CBD3a78500Cd8c44Aa13f48Cdd34fc62;
-    address constant EIGEN_owner=0xF9264dB5F1888EE15C0DF970761a3B2Dc28b0fc3;
-    IERC20 public ELP_Token;
-    IERC20 public EIGEN_Token;
-    address public owner;
-    uint256 exchangeRate;
+    address public constant ELP_tokenContract=0xAf6811D31E359A45EbbC72B4873fB43257B1a6b3;
+    address public constant EIGEN_tokenContract=0x8c76c1a8daEB698c742b48f6FA8BBDb8CE4f751a;
+    address public owner; //same as EIGEN_TOKEN owner (Makes sense as they are the same company)
+    uint256 ELP;
+    uint256 EIGEN;
 
     event TokensExchanged(address indexed user, uint256 ELPs, uint256 EIGENs);
-    event EigenAmount(uint256 eigen);
 
-    constructor(uint256 _exchangeRate)
+    constructor(uint256 _ELP, uint256 _EIGEN)
     {
-        ELP_Token = IERC20(ELP);
-        EIGEN_Token = IERC20(EIGEN);
-        exchangeRate=_exchangeRate;
+        ELP=_ELP;
+        EIGEN=_EIGEN;
         owner = msg.sender;
+        //Setting the ratio of ELP:EIGEN as 5:1
     }
 
-    receive() external payable
-    {
-        require(msg.sender == ELP, "Error - AIRDROP.sol - Function:receive - Only $ELPs are accepted");
 
-        uint256 amount = ELP_Token.balanceOf(address(this));
-        exchangeTokens(msg.sender,amount);
-    }
-
-    function exchangeTokens(address senderr, uint256 ELPs) internal nonReentrant
+    //user will need to approve this contract of spending "ELPs"
+    function exchangeTokens(uint256 ELPs) external nonReentrant
     {
         require(ELPs > 0, "Error - AIRDROP.sol - Function:exchangeTokens - ELPs must be greater than 0");
-        require(ELP_Token.balanceOf(msg.sender)>=ELPs, "Error - AIRDROP.sol - Function:exchangeTokens - User doesn't have enough ELPs");
+        require(msg.sender!=owner,"Error - AIRDROP.sol - Function:exchangeTokens - Owner can not call this function");
+        uint256 EIGENs = ELPs*EIGEN/ELP;
 
-        uint256 EIGENs = ELPs*((10**18)/(exchangeRate*(10**4)));
+        IERC20(ELP_tokenContract).transferFrom(msg.sender,owner,ELPs);
+        IERC20(EIGEN_tokenContract).transferFrom(owner,msg.sender,EIGENs);
 
-        EIGEN_Token.transferFrom(EIGEN_owner,senderr, EIGENs);
-        emit TokensExchanged(senderr, ELPs, EIGENs);
+        emit TokensExchanged(msg.sender, ELPs, EIGENs);
     }
 
 }
