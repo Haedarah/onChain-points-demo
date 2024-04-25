@@ -39,7 +39,7 @@ contract ELP_Marketplace is ReentrancyGuard
     {
         require(quantity > 0 && totalPrice > 0, "Error - MARKETPLACE.sol - Function:createListing - Invalid listing parameters");
         require(IERC20(ELP).balanceOf(msg.sender)>=quantity, "Error - MARKETPLACE.sol - Function:createListing - You are trying to list more tokens than you have");
-        require(totalPointsListedByUser[msg.sender]<=IERC20(ELP).balanceOf(msg.sender), "Error - MARKETPLACE.sol - Function:createListing - You don't have enough points to list this");
+        require(totalPointsListedByUser[msg.sender]<=IERC20(ELP).balanceOf(msg.sender), "Error - MARKETPLACE.sol - Function:createListing - You do not have enough points to list this");
 
         listings.push(Listing(msg.sender, quantity, totalPrice, status.live));
         totalPointsListedByUser[msg.sender]+=quantity;
@@ -49,8 +49,8 @@ contract ELP_Marketplace is ReentrancyGuard
 
     function cancelListing(uint256 id) external
     {
-        require (msg.sender==listings[id].seller,"Error - MARKETPLACE.sol - Function:cancelListing - You aren't the owner of this listing");
-        require (listings[id].listingStatus==status.live,"Error - MARKETPLACE.sol - Function:cancelListing - You can't cancel this listing");
+        require (msg.sender==listings[id].seller,"Error - MARKETPLACE.sol - Function:cancelListing - You are not the owner of this listing");
+        require (listings[id].listingStatus==status.live,"Error - MARKETPLACE.sol - Function:cancelListing - You can not cancel this listing");
 
         listings[id].listingStatus=status.cancelled;
         totalPointsListedByUser[msg.sender]-=listings[id].quantity;
@@ -62,8 +62,8 @@ contract ELP_Marketplace is ReentrancyGuard
     {
         require(listings[id].listingStatus==status.live, "Error - MARKETPLACE.sol - Function:buyListing - Listing is not live");
         require(msg.value == listings[id].totalPrice, "Error - MARKETPLACE.sol - Function:buyListing - Incorrect payment amount");
-        require(IERC20(ELP).allowance(listings[id].seller,address(this))>=listings[id].quantity,"Error - MARKETPLACE.sol - Function:buyListing - Seller denied the the contract's spending approval");
-        require(IERC20(ELP).balanceOf(listings[id].seller)>=listings[id].quantity,"Error - MARKETPLACE.sol - Function:buyListing - Seller doesn't have enough balance to complete the sale");
+        require(IERC20(ELP).allowance(listings[id].seller,address(this))>=listings[id].quantity,"Error - MARKETPLACE.sol - Function:buyListing - Seller denied the the contract spending approval");
+        require(IERC20(ELP).balanceOf(listings[id].seller)>=listings[id].quantity,"Error - MARKETPLACE.sol - Function:buyListing - Seller does not have enough balance to complete the sale");
 
         IERC20(ELP).transferFrom(listings[id].seller, msg.sender, listings[id].quantity);
 
