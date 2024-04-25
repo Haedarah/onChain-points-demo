@@ -17,4 +17,9 @@ By: 0x73029Df592EC27FeDddE45a512B4c42ad35A3e7d (Anuj's account)
 Deployed at: 0x01c3eb121B14fc72a76e2ae22F3e33a6A0a9b3ef
 By: 0x73029Df592EC27FeDddE45a512B4c42ad35A3e7d (Anuj's account)
 -----------------------------------------------------------------------------
+
+[[New_Marketplace.sol]]:
+Deployed at: 0x684C5Cc883C815E57D85B96A323d8CA343A4EE57
+By: 0xF9264dB5F1888EE15C0DF970761a3B2Dc28b0fc3
+-----------------------------------------------------------------------------
 Testnet: Base Sepolia
