@@ -40,16 +40,17 @@ contract New_Marketplace is ReentrancyGuard
 
 
     //createListing() errors
-    error InvalidParameters();
-    error NotEnoughTokensToList();
-    error ApprovedTokensAreNotEnough();
+    error InvalidParameters(uint256 Entered_pointId, uint256 Entered_quantity, uint256 Entered_totalPrice);
+    error NotEnoughTokensToList(uint256 userBalance,uint256 quantityTheyAreTryingToList);
+    error ApprovedTokensAreNotEnough(uint256 approvedTokensByUser, uint256 Entered_quantity);
+    error ExpiredPoint(uint256 pointId);
 
     //cancelListing() errors
-    error notTheListingOwner();
-    error listingIsNotLive();
+    error notTheListingOwner(address msgSender);
+    error listingIsNotLive(uint256 listingId);
 
     //buyListing() errors
-    error incorrectPayment();
+    error incorrectPayment(uint256 Entered_value,uint256 thePriceOfTheListing);
     
 
     constructor()
@@ -89,7 +90,7 @@ contract New_Marketplace is ReentrancyGuard
 
     function createListing(uint256 _pointId, uint256 _quantity, uint256 _totalPrice) external
     {
-        //Approval must be asked for right before calling this funciton by a user.
+        //Approval must be asked right before calling this funciton by a user.
         //The amount that we should ask to be approved by the user could be calculated as follows:
         //  1. The user will create a new listing of _ponitId="12". quantity="20". totalprice="1"
         //  2. From the UI, we call "getListings()" view function. This will return all the listings on the platform.
@@ -102,17 +103,28 @@ contract New_Marketplace is ReentrancyGuard
         //           listing of pointId=12 with a quantity of 20. The amount we ask the user to approve the contract to spend is: 25+18+30+20=93 points
  
         //Parameters must be right
-        //require(_quantity > 0 && _totalPrice > 0 && _pointId<points.length, "Error - MARKETPLACE.sol - Function:createListing - Invalid listing parameters");
-        if (_quantity <= 0 || _totalPrice <=0 || _pointId>=points.length) revert InvalidParameters();
+        if (_quantity <= 0 || _totalPrice <=0 || _pointId>=points.length)
+        {
+            revert InvalidParameters(_quantity,_totalPrice,_pointId);
+        }
         
         //User must have the Points they are trying to sell
-        //require(IERC20(points[_pointId].pointContractAddress).balanceOf(msg.sender)>=_quantity, "Error - MARKETPLACE.sol - Function:createListing - You are trying to list more tokens than you have");
-        if (IERC20(points[_pointId].pointContractAddress).balanceOf(msg.sender)<_quantity) revert NotEnoughTokensToList();
+        if (IERC20(points[_pointId].pointContractAddress).balanceOf(msg.sender)<_quantity)
+        {
+            revert NotEnoughTokensToList(IERC20(points[_pointId].pointContractAddress).balanceOf(msg.sender),_quantity);
+        }
         
         // User must allow this contract spending the amount they are trying to sell (at least)
-        //require(IERC20(points[_pointId].pointContractAddress).allowance(msg.sender,address(this))>=_quantity, "Error - MARKETPLACE.sol - Function:createListing - You did not approve the contract enough tokens");
-        if (IERC20(points[_pointId].pointContractAddress).allowance(msg.sender,address(this))<_quantity) revert ApprovedTokensAreNotEnough();
+        if (IERC20(points[_pointId].pointContractAddress).allowance(msg.sender,address(this))<_quantity)
+        {
+            revert ApprovedTokensAreNotEnough(IERC20(points[_pointId].pointContractAddress).allowance(msg.sender,address(this)),_quantity);
+        }
 
+        //check for the status of the point before listing
+        if (points[_pointId].status==pointStatus.off)
+        {
+            revert ExpiredPoint(_pointId);
+        }
 
         listings.push(Listing(_pointId,msg.sender, _quantity, _totalPrice, listingStatus.live));
         
@@ -122,10 +134,16 @@ contract New_Marketplace is ReentrancyGuard
     function cancelListing(uint256 id) external
     {
         //require (msg.sender==listings[id].seller,"Error - MARKETPLACE.sol - Function:cancelListing - You are not the owner of this listing");
-        if (msg.sender!=listings[id].seller) revert notTheListingOwner();
+        if (msg.sender!=listings[id].seller)
+        {
+            revert notTheListingOwner(msg.sender);
+        }
 
         //require (listings[id].status==listingStatus.live,"Error - MARKETPLACE.sol - Function:cancelListing - You can not cancel this listing");
-        if (listings[id].status!=listingStatus.live) revert listingIsNotLive();
+        if (listings[id].status!=listingStatus.live)
+        {
+            revert listingIsNotLive(id);
+        }
 
         listings[id].status=listingStatus.cancelled;
 
@@ -134,11 +152,9 @@ contract New_Marketplace is ReentrancyGuard
 
     function buyListing(uint256 id) external payable nonReentrant
     {
-        // require(listings[id].status==listingStatus.live, "Error - MARKETPLACE.sol - Function:buyListing - Listing is not live");
-        if (listings[id].status!=listingStatus.live) revert listingIsNotLive();
+        if (listings[id].status!=listingStatus.live) revert listingIsNotLive(id);
 
-        // require(msg.value == listings[id].totalPrice, "Error - MARKETPLACE.sol - Function:buyListing - Incorrect payment amount");
-        if (msg.value != listings[id].totalPrice) revert incorrectPayment();
+        if (msg.value != listings[id].totalPrice) revert incorrectPayment(msg.value,listings[id].totalPrice);
 
 
         address POINT=points[listings[id].pointId].pointContractAddress;
